@@ -75,6 +75,10 @@ angular.module('mentio', [])
                         return {iframe: $scope.iframeElement};
                     }
                 };
+                
+                $scope.displayAbove =  function() {
+                    return $attrs.mentioMenuPosition === 'top';
+                };                
 
                 $scope.replaceText = function (text, hasTrailingSpace) {
                     $scope.hideAll();
@@ -453,8 +457,8 @@ angular.module('mentio', [])
         };
     }])
 
-    .directive('mentioMenu', ['mentioUtil', '$rootScope', '$log', '$window', '$document',
-        function (mentioUtil, $rootScope, $log, $window, $document) {
+    .directive('mentioMenu', ['mentioUtil', '$rootScope', '$log', '$window', '$document', '$timeout',
+        function (mentioUtil, $rootScope, $log, $window, $document, $timeout) {
         return {
             restrict: 'E',
             scope: {
@@ -579,6 +583,15 @@ angular.module('mentio', [])
                             scope.visible = true;
                             scope.requestVisiblePendingSearch = false;
                         }
+                        
+                        // Display mention menu above the input
+                        if (scope.parentScope && scope.parentScope.displayAbove()) {
+						    $timeout(function () {
+                                element.css({
+                                    top: (scope.targetElement[0].getBoundingClientRect().top -element[0].clientHeight) + 'px'
+                                });
+                            });
+                        };		
                     } else {
                         scope.hideMenu();
                     }
